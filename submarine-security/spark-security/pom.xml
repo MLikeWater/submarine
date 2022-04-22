@@ -45,14 +45,14 @@
     <jersey-bundle.version>1.19.3</jersey-bundle.version>
     <noggit.version>0.6</noggit.version>
     <ranger.spark.package>submarine_spark_ranger_project</ranger.spark.package>
-    <ranger.version>1.2.0</ranger.version>
-    <ranger.major.version>1</ranger.major.version>
-    <spark.compatible.version>2</spark.compatible.version>
-    <scala.version>2.11.8</scala.version>
-    <scala.binary.version>2.11</scala.binary.version>
+    <ranger.version>2.2.0</ranger.version>
+    <ranger.major.version>2.2</ranger.major.version>
+    <spark.compatible.version>3</spark.compatible.version>
+    <scala.version>2.12.10</scala.version>
+    <scala.binary.version>2.12</scala.binary.version>
     <scalatest.version>2.2.6</scalatest.version>
     <solr.version>8.4.0</solr.version>
-    <spark.version>2.4.7</spark.version>
+    <spark.version>3.2.1</spark.version>
     <spark.scope>provided</spark.scope>
     <gethostname4j.version>0.0.2</gethostname4j.version>
     <gethostname4j.scope>test</gethostname4j.scope>
@@ -363,7 +363,8 @@
       <plugin>
         <groupId>net.alchim31.maven</groupId>
         <artifactId>scala-maven-plugin</artifactId>
-        <version>3.2.2</version>
+<!--        <version>3.2.2</version>-->
+        <version>4.5.4</version>
         <executions>
           <execution>
             <id>eclipse-add-source</id>
@@ -572,19 +573,46 @@
   </build>
 
   <profiles>
-    <profile>
-      <id>spark-2.4</id>
-      <properties>
-        <spark.version>2.4.7</spark.version>
-        <scalatest.version>3.0.3</scalatest.version>
-      </properties>
-    </profile>
+<!--    <profile>-->
+<!--      <id>spark-2.4</id>-->
+<!--      <properties>-->
+<!--        <spark.version>2.4.7</spark.version>-->
+<!--        <scalatest.version>3.0.3</scalatest.version>-->
+<!--      </properties>-->
+<!--    </profile>-->
 
     <profile>
       <id>spark-3.0</id>
       <properties>
         <spark.version>3.0.2</spark.version>
         <scala.version>2.12.10</scala.version>
+        <scala.binary.version>2.12</scala.binary.version>
+        <!--<scalatest.version>3.2.0</scalatest.version>-->
+        <spark.compatible.version>3</spark.compatible.version>
+        <commons-lang3.version>3.9</commons-lang3.version>
+        <jackson-databind.version>2.10.5</jackson-databind.version>
+        <jackson-annotations.version>2.10.5</jackson-annotations.version>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>spark-3.1</id>
+      <properties>
+        <spark.version>3.1.3</spark.version>
+        <scala.version>2.12.10</scala.version>
+        <scala.binary.version>2.12</scala.binary.version>
+        <!--<scalatest.version>3.2.0</scalatest.version>-->
+        <spark.compatible.version>3</spark.compatible.version>
+        <commons-lang3.version>3.9</commons-lang3.version>
+        <jackson-databind.version>2.10.5</jackson-databind.version>
+        <jackson-annotations.version>2.10.5</jackson-annotations.version>
+      </properties>
+    </profile>
+    <profile>
+      <id>spark-3.2</id>
+      <properties>
+        <spark.version>3.2.1</spark.version>
+        <scala.version>2.12.14</scala.version>
         <scala.binary.version>2.12</scala.binary.version>
         <!--<scalatest.version>3.2.0</scalatest.version>-->
         <spark.compatible.version>3</spark.compatible.version>
@@ -637,6 +665,19 @@
         <jna.scope>compile</jna.scope>
       </properties>
     </profile>
-
+    <profile>
+      <id>ranger-2.2</id>
+      <properties>
+        <httpcomponents.httpclient.version>4.5.6</httpcomponents.httpclient.version>
+        <httpcomponents.httpcore.version>4.4.6</httpcomponents.httpcore.version>
+        <httpcomponents.httpmime.version>4.5.6</httpcomponents.httpmime.version>
+        <ranger.version>2.2.0</ranger.version>
+        <ranger.major.version>2.2</ranger.major.version>
+        <solr.version>7.7.1</solr.version>
+        <elasticsearch.version>7.10.2</elasticsearch.version>
+        <gethostname4j.scope>compile</gethostname4j.scope>
+        <jna.scope>compile</jna.scope>
+      </properties>
+    </profile>
   </profiles>
 </project>

@@ -20,14 +20,13 @@
 package org.apache.spark.sql.execution
 
 import org.apache.spark.sql.{Row, SparkSession}
-import org.apache.spark.sql.execution.command.RunnableCommand
-
+import org.apache.spark.sql.execution.command.{LeafRunnableCommand, RunnableCommand}
 import org.apache.submarine.spark.compatible.CompatibleCommand.ShowDatabasesCommandCompatible
 import org.apache.submarine.spark.compatible.CompatibleFunc
 import org.apache.submarine.spark.security.{RangerSparkAuthorizer, SparkPrivilegeObject, SparkPrivilegeObjectType}
 
 case class SubmarineShowDatabasesCommand(child: ShowDatabasesCommandCompatible)
-  extends RunnableCommand {
+  extends LeafRunnableCommand {
   override val output = child.output
 
   override def run(sparkSession: SparkSession): Seq[Row] = {

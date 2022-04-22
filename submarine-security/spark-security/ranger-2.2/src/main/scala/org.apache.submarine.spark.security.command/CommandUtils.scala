@@ -19,11 +19,15 @@
 
 package org.apache.submarine.spark.security.command
 
-import org.apache.spark.sql.{Row, SparkSession}
-import org.apache.spark.sql.execution.command.{LeafRunnableCommand, RunnableCommand}
+private[command] object CommandUtils {
 
-case class ShowRolesCommand() extends LeafRunnableCommand {
-  override def run(sparkSession: SparkSession): Seq[Row] = {
-    throw new UnsupportedOperationException("SHOW ROLES")
+  final val RESERVED_ROLE_NAMES = Set("ALL", "DEFAULT", "NONE")
+
+  def validateRoleName(roleName: String): Unit = {
+    if (RESERVED_ROLE_NAMES.exists(roleName.equalsIgnoreCase)) {
+      throw new IllegalArgumentException(s"Role name cannot be one of the reserved roles: " +
+        s"${RESERVED_ROLE_NAMES.mkString(",")}")
+    }
   }
+
 }

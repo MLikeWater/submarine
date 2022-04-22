@@ -20,22 +20,21 @@
 package org.apache.spark.sql.hive
 
 import scala.collection.mutable.ArrayBuffer
-
 import org.apache.spark.sql.AuthzUtils._
 import org.apache.spark.sql.SaveMode
 import org.apache.spark.sql.catalyst.TableIdentifier
 import org.apache.spark.sql.catalyst.analysis.UnresolvedRelation
 import org.apache.spark.sql.catalyst.catalog.CatalogTable
 import org.apache.spark.sql.catalyst.expressions.NamedExpression
-import org.apache.spark.sql.catalyst.plans.logical.{Command, LogicalPlan, Project}
+import org.apache.spark.sql.catalyst.parser.ParserUtils.EnhancedLogicalPlan
+import org.apache.spark.sql.catalyst.plans.logical.{CacheTable, Command, LogicalPlan, Project}
 import org.apache.spark.sql.execution.command._
 import org.apache.spark.sql.execution.datasources.{InsertIntoDataSourceCommand, InsertIntoHadoopFsRelationCommand, LogicalRelation}
 import org.apache.spark.sql.hive.execution.CreateHiveTableAsSelectCommand
 import org.apache.spark.sql.types.StructField
-
 import org.apache.submarine.spark.compatible.{CompatibleFunc, PersistedViewCompatible}
 import org.apache.submarine.spark.compatible.CompatibleCommand.SetDatabaseCommandCompatible
-import org.apache.submarine.spark.security.{SparkPrivilegeObject, SparkPrivilegeObjectType, SparkPrivObjectActionType}
+import org.apache.submarine.spark.security.{SparkPrivObjectActionType, SparkPrivilegeObject, SparkPrivilegeObjectType}
 import org.apache.submarine.spark.security.SparkPrivObjectActionType.SparkPrivObjectActionType
 
 
@@ -168,7 +167,8 @@ private[sql] object PrivilegesBuilder {
         addTableOrViewLevelObjs(a.tableName, inputObjs)
         addTableOrViewLevelObjs(a.tableName, outputObjs)
 
-      case a: AlterTableRecoverPartitionsCommand =>
+      case a: RepairTableCommand =>
+        // SPARK-34518 rename AlterTableRecoverPartitionsCommand to RepairTableCommand
         addTableOrViewLevelObjs(a.tableName, inputObjs)
         addTableOrViewLevelObjs(a.tableName, outputObjs)
 
@@ -220,7 +220,7 @@ private[sql] object PrivilegesBuilder {
         addTableOrViewLevelObjs(a.tableIdent, inputObjs, columns = Seq("RAW__DATA__SIZE"))
         addTableOrViewLevelObjs(a.tableIdent, outputObjs)
 
-      case c: CacheTableCommand => c.plan.foreach {
+      case c: CacheTable => c.plan.foreach {
         buildQuery(_, inputObjs)
       }
 
@@ -261,7 +261,8 @@ private[sql] object PrivilegesBuilder {
             addTableOrViewLevelObjs(c.name, outputObjs)
           case _ =>
         }
-        buildQuery(c.child, inputObjs)
+        // buildQuery(c.child, inputObjs)
+        buildQuery(c.plan, inputObjs)
 
       case d if d.nodeName == "DescribeColumnCommand" =>
         addTableOrViewLevelObjs(

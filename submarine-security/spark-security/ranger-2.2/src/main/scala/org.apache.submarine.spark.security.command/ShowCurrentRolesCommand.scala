@@ -19,11 +19,31 @@
 
 package org.apache.submarine.spark.security.command
 
+import scala.collection.JavaConverters._
+import scala.util.control.NonFatal
+import org.apache.hadoop.security.UserGroupInformation
 import org.apache.spark.sql.{Row, SparkSession}
+import org.apache.spark.sql.catalyst.expressions.{Attribute, AttributeReference}
 import org.apache.spark.sql.execution.command.{LeafRunnableCommand, RunnableCommand}
+import org.apache.spark.sql.types.StringType
+import org.apache.submarine.spark.security.{RangerSparkAuditHandler, RangerSparkPlugin, SparkAccessControlException}
 
-case class ShowRolesCommand() extends LeafRunnableCommand {
+case class ShowCurrentRolesCommand() extends LeafRunnableCommand {
+
+  override def output: Seq[Attribute] =
+    Seq(AttributeReference("Role Name", StringType, nullable = false)())
+
   override def run(sparkSession: SparkSession): Seq[Row] = {
-    throw new UnsupportedOperationException("SHOW ROLES")
+
+    try {
+      val auditHandler = RangerSparkAuditHandler()
+      val currentUser = UserGroupInformation.getCurrentUser.getShortUserName
+      val roles = RangerSparkPlugin.getUserRoles(currentUser, auditHandler)
+      roles.asScala.map(Row(_))
+    } catch {
+      case NonFatal(e) => throw new SparkAccessControlException(e.getMessage, e)
+    } finally {
+      // TODO: support auditHandler.flushAudit()
+    }
   }
 }

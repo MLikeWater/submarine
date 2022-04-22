@@ -119,7 +119,7 @@ case class SubmarineRowFilterExtension(spark: SparkSession) extends Rule[Logical
     case c: Command => c match {
       case c: CreateDataSourceTableAsSelectCommand => c.copy(query = doFiltering(c.query))
       case c: CreateHiveTableAsSelectCommand => c.copy(query = doFiltering(c.query))
-      case c: CreateViewCommand => c.copy(child = doFiltering(c.child))
+      case c: CreateViewCommand => c.copy(plan = doFiltering(c.plan))
       case i: InsertIntoDataSourceCommand => i.copy(query = doFiltering(i.query))
       case i: InsertIntoDataSourceDirCommand => i.copy(query = doFiltering(i.query))
       case i: InsertIntoHadoopFsRelationCommand => i.copy(query = doFiltering(i.query))

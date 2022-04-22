@@ -109,8 +109,4 @@ class SubmarineSqlParser(val delegate: ParserInterface) extends ParserInterface 
     delegate.parseMultipartIdentifier(sqlText)
   }
 
-  override def parseRawDataType(sqlText: String): DataType = {
-    delegate.parseRawDataType(sqlText)
-  }
-
 }

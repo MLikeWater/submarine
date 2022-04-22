@@ -20,9 +20,9 @@
 package org.apache.submarine.spark.security.command
 
 import org.apache.spark.sql.{Row, SparkSession}
-import org.apache.spark.sql.execution.command.RunnableCommand
+import org.apache.spark.sql.execution.command.{LeafRunnableCommand, RunnableCommand}
 
-case class ShowCurrentRolesCommand() extends RunnableCommand {
+case class ShowCurrentRolesCommand() extends LeafRunnableCommand {
   override def run(sparkSession: SparkSession): Seq[Row] = {
     throw new UnsupportedOperationException("SHOW CURRENT ROLES")
   }

@@ -19,11 +19,39 @@
 
 package org.apache.submarine.spark.security.command
 
+import java.util.Arrays
+import scala.util.control.NonFatal
+import org.apache.hadoop.security.UserGroupInformation
+import org.apache.ranger.plugin.model.RangerRole
+import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan
 import org.apache.spark.sql.{Row, SparkSession}
 import org.apache.spark.sql.execution.command.{LeafRunnableCommand, RunnableCommand}
+import org.apache.submarine.spark.security.{RangerSparkAuditHandler, RangerSparkPlugin, SparkAccessControlException}
+
 
 case class CreateRoleCommand(roleName: String) extends LeafRunnableCommand {
+  import CommandUtils._
   override def run(sparkSession: SparkSession): Seq[Row] = {
-    throw new UnsupportedOperationException("CREATE ROLE")
+
+    validateRoleName(roleName)
+    val auditHandler = RangerSparkAuditHandler()
+    val currentUser = UserGroupInformation.getCurrentUser.getShortUserName
+
+    val role = new RangerRole()
+    role.setName(roleName)
+    role.setCreatedByUser(currentUser)
+    role.setCreatedBy(currentUser)
+    role.setUpdatedBy(currentUser)
+    val member = new RangerRole.RoleMember(currentUser, true)
+    role.setUsers(Arrays.asList(member))
+    try {
+      val res = RangerSparkPlugin.createRole(role, auditHandler)
+      logDebug(s"Create role: ${res.getName} success")
+      Seq.empty[Row]
+    } catch {
+      case NonFatal(e) => throw new SparkAccessControlException(e.getMessage, e)
+    } finally {
+      // TODO: support auditHandler.flushAudit()
+    }
   }
 }
